@@ -1,0 +1,13 @@
+QQ :
+  QQGroup_id : 542475913 # 在此输入您的QQ群号
+  QQAPI : "http://101.33.208.219:5700/send_group_msg" # 在此输入您已经配置好的go-cqhttp接口
+  QQURL : "127.0.0.1"
+  QQPort : 5710
+
+MC :
+  MCURL : "http://101.33.208.219:23333" # 在此输入您的MCSManager链接
+  MCUUID : "ce103e8f080b4ea4ae027490efaa3ac3" #在此输入您在MCSManager中的实例的UID
+  MCREMOTE_UUID : "79bce8590bd44ec281854136a8ef86a5" # 在此输入您在MCSManager中的实例所对应的节点的ID，也是实例的GID
+  MCAPIKEY : "34f551f078d14a25bfab93440a702230" # 在此输入您在MCSManager中配置好的APIKEY
+  MCLOG : "/home/lighthouse/logs/latest.log" # 在此输入您的MC服务端的latest.log的位置（绝对位置与相对位置均可）
+

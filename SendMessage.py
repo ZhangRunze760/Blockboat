@@ -1,5 +1,5 @@
 import requests
-import QQMCBind
+import QQMessageProcessing
 
 
 # 定义QQ消息的发送函数
@@ -131,43 +131,11 @@ def mc_command_send(qqapi_url, group_id, mcapi_url, uuid, remote_uuid, apikey, c
     return request
 
 
-def cq_processing(message):
-    # 将表情所对应的CQ码转换为"表情"
-    CQFaceID = 0
-    while CQFaceID < 222:
-        if ("[CQ:face,id=" + str(CQFaceID) + "]") in message:
-            message = message.replace("[CQ:face,id=" + str(CQFaceID) + "]", "【表情】")
-        CQFaceID += 1
-
-    # 将语音所对应的CQ码转换为"语音"
-    if message[0:11] == "[CQ:record,":
-        message = "【语音】"
-
-    # 将图片所对应的CQ码转换为"图片"
-    if "[CQ:image," in message:
-        if message[0:10] == "[CQ:image,":
-            message = "【图片】"
-        else:
-            message = message.split("[CQ:image,")[0] + "【图片】"
-    # 将回复类型的消息进行转换
-    if "[CQ:reply,id=" in message:
-        raw_message = (((message.split("[CQ:reply,id="))[1]).split('[CQ:at,qq='))[2].split('] ')[1]
-        qqid = (((message.split("[CQ:reply,id="))[1]).split('[CQ:at,qq='))[2].split('] ')[0]
-        mcid = QQMCBind.look_for_mcid(qqid)
-        message = "【回复@" + str(mcid) + "】:" + str(raw_message)
-    if "[CQ:at,qq=" in message:
-        at_qqid = ((message.split("[CQ:at,qq="))[1].split('] '))[0]
-        raw_message = ((message.split("[CQ:at,qq="))[1].split('] '))[1]
-        mcid = QQMCBind.look_for_mcid(at_qqid)
-        message = "@" + str(mcid) + " " + str(raw_message)
-    return message
-
-
 # 借助上一个发送命令的函数，同样可以定义出消息发送的函数
 def mc_message_send(mcapi_url, uuid, remote_uuid, apikey, message, sender):
     mcapi = "/api/protected_instance/command"
     # 将我们手头上的消息进行第一步处理
-    message = cq_processing(message)
+    message = QQMessageProcessing.cq_processing(message)
     # 将前面已经处理好的消息进行第二步处理，变成一会会在游戏内看到的消息格式
     message_will_be_send = '*<' + sender + '> ' + message
 

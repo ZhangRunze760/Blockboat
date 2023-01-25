@@ -1,5 +1,37 @@
-import SendMessage
 import QQMCBind
+import SendMessage
+
+
+def cq_processing(message):
+    # 将表情所对应的CQ码转换为"表情"
+    CQFaceID = 0
+    while CQFaceID < 222:
+        if ("[CQ:face,id=" + str(CQFaceID) + "]") in message:
+            message = message.replace("[CQ:face,id=" + str(CQFaceID) + "]", "【表情】")
+        CQFaceID += 1
+
+    # 将语音所对应的CQ码转换为"语音"
+    if message[0:11] == "[CQ:record,":
+        message = "【语音】"
+
+    # 将图片所对应的CQ码转换为"图片"
+    if "[CQ:image," in message:
+        if message[0:10] == "[CQ:image,":
+            message = "【图片】"
+        else:
+            message = message.split("[CQ:image,")[0] + "【图片】"
+    # 将回复类型的消息进行转换
+    if "[CQ:reply,id=" in message:
+        raw_message = (((message.split("[CQ:reply,id="))[1]).split('[CQ:at,qq='))[2].split('] ')[1]
+        qqid = (((message.split("[CQ:reply,id="))[1]).split('[CQ:at,qq='))[2].split('] ')[0]
+        mcid = QQMCBind.look_for_mcid(qqid)
+        message = "【回复@" + str(mcid) + "】:" + str(raw_message)
+    if "[CQ:at,qq=" in message:
+        at_qqid = ((message.split("[CQ:at,qq="))[1].split('] '))[0]
+        raw_message = ((message.split("[CQ:at,qq="))[1].split('] '))[1]
+        mcid = QQMCBind.look_for_mcid(at_qqid)
+        message = "@" + str(mcid) + " " + str(raw_message)
+    return message
 
 
 # 定义我们的权限识别函数，通过访问oplist.txt来识别member的权限
@@ -30,7 +62,7 @@ def qq_message_processing(qqapi_url, qqgroup_id, mcapi_url, uuid, remote_uuid, a
         QQMCBind.qq_bind_with_mc(qqapi_url, qqgroup_id, qqid, arg)
     elif message == "unbind":
         QQMCBind.qq_mc_unbind(qqapi_url, qqgroup_id, str(qqid))
-    
+
     # 判断消息前四位是否为命令前缀sudo，如果是，则按命令的形式处理
     elif message[0:5] == "sudo ":
         # 调用前面定义的权限识别函数，识别用户的权限

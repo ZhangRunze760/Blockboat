@@ -5,7 +5,7 @@ import SendMessage
 def cq_processing(message):
     # 将表情所对应的CQ码转换为"表情"
     CQFaceID = 0
-    while CQFaceID < 222:
+    while CQFaceID < 313:
         if ("[CQ:face,id=" + str(CQFaceID) + "]") in message:
             message = message.replace("[CQ:face,id=" + str(CQFaceID) + "]", "【表情】")
         CQFaceID += 1

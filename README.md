@@ -1,5 +1,5 @@
 # 简介
-Blockboat（百舸）QQ机器人，支持任何一种java版mc服务端的群服互联机器人，支持游戏内at，再也不怕冷群。
+Blockboat（百舸）QQ机器人，支持任何一种mc服务端的群服互联机器人，支持游戏内at，再也不怕冷群。
 # 预备环境
 MC服务端，go-cqhttp框架，MCSManager 9.x。
 # 功能

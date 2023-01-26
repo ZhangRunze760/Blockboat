@@ -1,7 +1,7 @@
-#qqbot命令列表
+# qqbot命令列表
  直接输入即可
 
-  #sudo list        相当于原版的/list命令，返回这个命令的输出
+  # sudo list        相当于原版的/list命令，返回这个命令的输出
    sudo + <命令>    需要权限的命令，如果有权限，则直接通过API输入进控制台  例如<whitelist add><whitelist list>...
    bind + <MCID>    绑定命令，将QQ号与MCID进行绑定，便于QQ与服务器通信
    unbind           解绑命令，不需要任何参数

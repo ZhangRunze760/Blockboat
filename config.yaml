@@ -10,4 +10,4 @@ MC :
   MCREMOTE_UUID : "79bce8590bd44efadsgdgdsf86a5" # 在此输入您在MCSManager中的实例所对应的节点的ID，也是实例的GID
   MCAPIKEY : "34f551f078d14a25bfab93ewftfwsredw0" # 在此输入您在MCSManager中配置好的APIKEY
   MCLOG : "../logs/latest.log" # 在此输入您的MC服务端的latest.log的位置（绝对位置与相对位置均可）
-
+  "IsJavaEdition": True

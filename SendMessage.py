@@ -132,7 +132,7 @@ def mc_command_send(qqapi_url, group_id, mcapi_url, uuid, remote_uuid, apikey, c
 
 
 # 借助上一个发送命令的函数，同样可以定义出消息发送的函数
-def mc_message_send(mcapi_url, uuid, remote_uuid, apikey, message, sender):
+def mc_message_send(mcapi_url, uuid, remote_uuid, apikey, message, sender, java_edition):
     mcapi = "/api/protected_instance/command"
     # 将我们手头上的消息进行第一步处理
     message = QQMessageProcessing.cq_processing(message)
@@ -140,7 +140,10 @@ def mc_message_send(mcapi_url, uuid, remote_uuid, apikey, message, sender):
     message_will_be_send = '*<' + sender + '> ' + message
 
     # 同样是运用字符串的拼接，将我们处理好的消息再次处理为JSON格式，并在最前面加上tellraw从而使其由服务端内部命令tellraw处理
-    arg = "tellraw " + "@a " + "{\"text\":\"" + message_will_be_send + "\",\"color\":\"yellow\"}"
+    if java_edition:
+        arg = "tellraw " + "@a " + "{\"text\":\"" + message_will_be_send + "\",\"color\":\"yellow\"}"
+    else:
+        arg = "tellraw @a {\"rawtext\":[{\"text\":\"" + message_will_be_send + "\"}]}"
     # 将上一个处理好的字符串以命令的形式发送回服务器，从而实现与服务器之间的通信
     http_command = mcapi_url + \
                    mcapi + \

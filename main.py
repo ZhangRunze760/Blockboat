@@ -19,7 +19,7 @@ MCURL = MC['MCURL']
 MCUUID = MC['MCUUID']
 MCREMOTE_UUID = MC['MCREMOTE_UUID']
 MCAPIKEY = MC['MCAPIKEY']
-
+java_edition = MC['IsJavaEdition']
 app = Flask(__name__)
 
 
@@ -42,7 +42,7 @@ def post_data():
         message = request.get_json().get('raw_message')  # 发的什么东西
 
         QQMessageProcessing.qq_message_processing(QQAPI, QQGroup_id, MCURL, MCUUID, MCREMOTE_UUID, MCAPIKEY, message,
-                                                  qqid, who)
+                                                  qqid, who, java_edition)
 
     return 'OK'  # 对go-cqhttp进行响应，不然会出现三次重试
 

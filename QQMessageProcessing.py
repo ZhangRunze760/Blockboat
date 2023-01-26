@@ -49,7 +49,7 @@ def is_member_in_oplist(member):
 
 
 # 定义QQ消息的处理并检查是否为命令，同时调用SendMessage中的命令发送函数执行它，若不是，则作为消息进行转发
-def qq_message_processing(qqapi_url, qqgroup_id, mcapi_url, uuid, remote_uuid, apikey, message, qqid, sender):
+def qq_message_processing(qqapi_url, qqgroup_id, mcapi_url, uuid, remote_uuid, apikey, message, qqid, sender, java_edition):
     warning = "权限不够！"
     message = str(message)
     # 判断命令是否为无需权限即可执行的list
@@ -102,4 +102,4 @@ def qq_message_processing(qqapi_url, qqgroup_id, mcapi_url, uuid, remote_uuid, a
 
     # 如果没有上述前缀，则视为普通消息进行转发
     else:
-        return SendMessage.mc_message_send(mcapi_url, uuid, remote_uuid, apikey, message, sender)
+        return SendMessage.mc_message_send(mcapi_url, uuid, remote_uuid, apikey, message, sender, java_edition)

@@ -4,7 +4,7 @@ import re
 import QQMCBind
 import time
 
-with open('config.yaml', 'r', encoding='utf-8') as file:
+with open('botconfig.yaml', 'r', encoding='utf-8') as file:
     yaml_info = yaml.load(file, Loader=yaml.FullLoader)
 
 MC = yaml_info['MC']

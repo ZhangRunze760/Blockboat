@@ -4,7 +4,7 @@ from flask import Flask, request
 import QQMCBind
 
 # 运用with语句和yaml处理函数提取出我们在yaml文件中所写的数据，并打包为字典
-with open('config.yaml', 'r', encoding='utf-8') as file:
+with open('botconfig.yaml', 'r', encoding='utf-8') as file:
     yaml_info = yaml.load(file, Loader=yaml.FullLoader)
 # 将这部字典中的两部字典提取出来
 QQ = yaml_info['QQ']

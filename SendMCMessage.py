@@ -2,6 +2,7 @@ import yaml
 import SendMessage
 import re
 import QQMCBind
+import time
 
 with open('config.yaml', 'r', encoding='utf-8') as file:
     yaml_info = yaml.load(file, Loader=yaml.FullLoader)
@@ -82,3 +83,4 @@ while True:
         print(SendMessage.qq_message_send(QQAPI, QQGroup_id, message))
         print(message)
         message_bak = message
+        time.sleep(0.3)

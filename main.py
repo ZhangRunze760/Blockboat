@@ -1,5 +1,5 @@
 import yaml
-import QQMessageProcessing
+import MessageProcessing
 from flask import Flask, request
 import QQMCBind
 
@@ -41,7 +41,7 @@ def post_data():
             who = request.get_json().get('sender').get('card')
         message = request.get_json().get('raw_message')  # 发的什么东西
 
-        QQMessageProcessing.qq_message_processing(QQAPI, QQGroup_id, MCURL, MCUUID, MCREMOTE_UUID, MCAPIKEY, message,
+        MessageProcessing.qq_message_processing(QQAPI, QQGroup_id, MCURL, MCUUID, MCREMOTE_UUID, MCAPIKEY, message,
                                                   qqid, who, java_edition)
 
     return 'OK'  # 对go-cqhttp进行响应，不然会出现三次重试

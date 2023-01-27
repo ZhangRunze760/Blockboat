@@ -1,5 +1,5 @@
 import requests
-import QQMessageProcessing
+import MessageProcessing
 
 
 # 定义QQ消息的发送函数
@@ -135,7 +135,7 @@ def mc_command_send(qqapi_url, group_id, mcapi_url, uuid, remote_uuid, apikey, c
 def mc_message_send(mcapi_url, uuid, remote_uuid, apikey, message, sender, java_edition):
     mcapi = "/api/protected_instance/command"
     # 将我们手头上的消息进行第一步处理
-    message = QQMessageProcessing.cq_processing(message)
+    message = MessageProcessing.cq_processing(message)
     # 将前面已经处理好的消息进行第二步处理，变成一会会在游戏内看到的消息格式
     message_will_be_send = '*<' + sender + '> ' + message
 
@@ -154,3 +154,34 @@ def mc_message_send(mcapi_url, uuid, remote_uuid, apikey, message, sender, java_
                    '&' + 'command=' + arg
     request = requests.get(http_command)
     return [request, message_will_be_send]
+
+
+def qq_shut_send(qqapi_url, qqgroup_id, qqid, time):
+    qqapi_url = qqapi_url.replace('send_group_msg', 'set_group_ban')
+    data = {
+        'group_id': qqgroup_id,
+        'user_id': qqid,
+        'duration': time
+    }
+    request = requests.post(qqapi_url, data=data)
+    return request
+
+
+def qq_shutall_send(qqapi_url, qqgroup_id, enable):
+    qqapi_url = qqapi_url.replace('send_group_msg', '/set_group_whole_ban')
+    data = {
+        'group_id': qqgroup_id,
+        'enable': enable
+    }
+    request = requests.post(qqapi_url, data=data)
+    return request
+
+
+def qq_kick_send(qqapi_url, qqgroup_id, qqid):
+    qqapi_url = qqapi_url.replace('send_group_msg', 'set_group_kick')
+    data = {
+        'group_id': qqgroup_id,
+        'user_id': qqid
+    }
+    request = requests.post(qqapi_url, data=data)
+    return request

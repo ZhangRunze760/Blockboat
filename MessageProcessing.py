@@ -1,14 +1,14 @@
 import QQMCBind
 import SendMessage
+import re
 
 
 def cq_processing(message):
+    message = str(message)
     # 将表情所对应的CQ码转换为"表情"
-    CQFaceID = 0
-    while CQFaceID < 313:
-        if ("[CQ:face,id=" + str(CQFaceID) + "]") in message:
-            message = message.replace("[CQ:face,id=" + str(CQFaceID) + "]", "【表情】")
-        CQFaceID += 1
+    if "[CQ:face," in message and "]" in message:
+        CQ_code = '[' + message.split('[')[1].split(']')[0] + ']'
+        message = message.replace(CQ_code, "【表情】")
 
     # 将语音所对应的CQ码转换为"语音"
     if message[0:11] == "[CQ:record,":
@@ -104,3 +104,56 @@ def qq_message_processing(qqapi_url, qqgroup_id, mcapi_url, uuid, remote_uuid, a
     # 如果没有上述前缀，则视为普通消息进行转发
     else:
         return SendMessage.mc_message_send(mcapi_url, uuid, remote_uuid, apikey, message, sender, java_edition)
+
+
+def qq_command_processing(qqapi_url, qqgroup_id, message):
+    mc_command_body = message.replace("!! ", '')
+    mc_command_arg = mc_command_body.split(' ')[0]
+    if mc_command_arg == 'shut':
+        arg = QQMCBind.look_for_qqid(mc_command_body.split(' ')[1])
+        time = mc_command_body.split(' ')[2]
+        SendMessage.qq_shut_send(qqapi_url, qqgroup_id, arg, time)
+    elif mc_command_arg == 'shutall':
+        enable = bool(mc_command_body.split(' ')[1])
+        SendMessage.qq_shutall_send(qqapi_url, qqgroup_id, enable)
+    elif mc_command_arg == 'kick':
+        qqid = QQMCBind.look_for_qqid(mc_command_body.split(' ')[1])
+        SendMessage.qq_kick_send(qqapi_url, qqgroup_id, qqid)
+
+
+def mc_message_processing(qqapi_url, qqgroup_id, last_line):
+    death_pat = re.compile(r'([\d\D]*) (was|experienced|blew|hit|fell|went|walked|burned|trie|discovered|froze|starved'
+                           r'|died|drowned|suffocated|withered)([\d\D]*)\n')
+    Message = ''
+    # 分情况处理消息，返回处理好的消息内容
+    if "[Server thread/INFO]" in last_line:
+        if "[Server thread/INFO]: [Not Secure]" in last_line:
+            Message = last_line[46:-1]
+            raw_message = Message.replace('<', '').split('> ')[1]
+            if raw_message[0:3] == "!! ":
+                qq_command_processing(qqapi_url, qqgroup_id, Message)
+                return None
+        if "[Server thread/INFO]: There are" in last_line:
+            Message = last_line[33:-1]
+        if "[pool-2-thread-1/INFO]: [Textile Backup] Starting backup" in last_line:
+            Message = "开始备份...可能会出现微小卡顿。"
+        if "[pool-2-thread-1/INFO]: [Textile Backup] Compression took:" in last_line:
+            Message = "备份完成！花费时间：" + last_line[58:-1]
+        if "[Server thread/INFO]" in last_line and " joined the game" in last_line:
+            Message = last_line[33:-17] + "加入了游戏"
+        if "[Server thread/INFO]" in last_line and "left the game" in last_line:
+            Message = last_line[33:-15] + "退出了游戏"
+    else:
+        if "[pool-2-thread-1/INFO]: [Textile Backup] Starting backup" in last_line:
+            Message = "开始备份...可能会出现微小卡顿。"
+        if "[pool-2-thread-1/INFO]: [Textile Backup] Compression took:" in last_line:
+            Message = "备份完成！花费时间：" + last_line[70:-1]
+
+    if '@' in Message:
+        mcid = (Message.split('@')[1]).split(' ')[0]
+        qqid = QQMCBind.look_for_qqid(mcid)
+        at = '@' + str(mcid) + ' '
+        message_new = Message.replace(at, '[CQ:at,qq=' + str(qqid) + ']')
+        return message_new
+    else:
+        return Message

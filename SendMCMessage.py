@@ -1,7 +1,7 @@
 import yaml
+
+import MessageProcessing
 import SendMessage
-import re
-import QQMCBind
 import time
 
 with open('botconfig.yaml', 'r', encoding='utf-8') as file:
@@ -13,9 +13,6 @@ QQ = yaml_info['QQ']
 QQAPI = QQ['QQAPI']
 QQGroup_id = QQ['QQGroup_id']
 log = MC['MCLOG']
-
-death_pat = re.compile(r'([\d\D]*) (was|experienced|blew|hit|fell|went|walked|burned|trie|discovered|froze|starved'
-                       r'|died|drowned|suffocated|withered)([\d\D]*)\n')
 message_bak = None
 
 
@@ -37,46 +34,9 @@ def lastline_get(fname):
     return last_line
 
 
-
-def mc_message_processing(last_line):
-    Message = ''
-    # 分情况处理消息，返回处理好的消息内容
-    if "[Server thread/INFO]" in last_line:
-        if "[Server thread/INFO]: [Not Secure]" in last_line:
-            Message = last_line[46:-1]
-        if "[Server thread/INFO]: There are" in last_line:
-            Message = last_line[33:-1]
-        if "[pool-2-thread-1/INFO]: [Textile Backup] Starting backup" in last_line:
-            Message = "开始备份...可能会出现微小卡顿。"
-        if "[pool-2-thread-1/INFO]: [Textile Backup] Compression took:" in last_line:
-            Message = "备份完成！花费时间：" + last_line[58:-1]
-        if "[Server thread/INFO]" in last_line and " joined the game" in last_line:
-            Message = last_line[33:-17] + "加入了游戏"
-        if "[Server thread/INFO]" in last_line and "left the game" in last_line:
-            Message = last_line[33:-15] + "退出了游戏"
-    else:
-        if "[pool-2-thread-1/INFO]: [Textile Backup] Starting backup" in last_line:
-            Message = "开始备份...可能会出现微小卡顿。"
-        if "[pool-2-thread-1/INFO]: [Textile Backup] Compression took:" in last_line:
-            Message = "备份完成！花费时间：" + last_line[70:-1]
-
-        # 用正则表达式处理死亡消息
-        death_match = re.match(death_pat, last_line)
-        if death_match is not None:
-            Message = death_match
-    if '@' in Message:
-        mcid = (Message.split('@')[1]).split(' ')[0]
-        qqid = QQMCBind.look_for_qqid(mcid)
-        at = '@' + str(mcid) + ' '
-        message_new = Message.replace(at, '[CQ:at,qq=' + str(qqid) + ']')
-        return message_new
-    else:
-        return Message
-
-
 # 通过一个死循环来反复读取日志最后一行，实现类似tail -f的功能
 while True:
-    message = mc_message_processing(lastline_get(log))
+    message = MessageProcessing.mc_message_processing(QQAPI, QQGroup_id, lastline_get(log))
     # 比较这一次的读取和上一次的读取有什么不同，若相同，则不输出，反之则输出
     if message != message_bak and message is not None and message != 'None':
         # 将API返回的状态码和处理好的消息打印出来，便于检查与调试

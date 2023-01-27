@@ -1,6 +1,5 @@
 import QQMCBind
 import SendMessage
-import re
 
 
 def cq_processing(message):
@@ -122,8 +121,6 @@ def qq_command_processing(qqapi_url, qqgroup_id, message):
 
 
 def mc_message_processing(qqapi_url, qqgroup_id, last_line):
-    death_pat = re.compile(r'([\d\D]*) (was|experienced|blew|hit|fell|went|walked|burned|trie|discovered|froze|starved'
-                           r'|died|drowned|suffocated|withered)([\d\D]*)\n')
     Message = ''
     # 分情况处理消息，返回处理好的消息内容
     if "[Server thread/INFO]" in last_line:

@@ -126,15 +126,17 @@ def mc_message_processing(qqapi_url, qqgroup_id, mcapi_url, mcuuid, mcremote_uui
     if "[Server thread/INFO]" in last_line:
         if "[Server thread/INFO]: [Not Secure]" in last_line:
             Message = last_line[46:-1]
+            message_bak = ''
             raw_message = Message.replace('<', '').split('> ')[1]
             sender = QQMCBind.look_for_qqid(Message.replace('<', '').split('> ')[0])
-            if raw_message[0:3] == "!! ":
+            if raw_message[0:2] == "!!" and Message != message_bak:
                 if is_member_in_oplist(sender):
                     qq_command_processing(qqapi_url, qqgroup_id, Message)
                     return None
                 else:
                     SendMessage.send_robot_message(qqapi_url, qqgroup_id, mcapi_url, mcuuid, mcremote_uuid, mcapikey,
                                                    '权限不够！', edition)
+            message_bak = Message
 
         if "[Server thread/INFO]: There are" in last_line:
             Message = last_line[33:-1]

@@ -106,7 +106,7 @@ def qq_message_processing(qqapi_url, qqgroup_id, mcapi_url, uuid, remote_uuid, a
 
 
 def qq_command_processing(qqapi_url, qqgroup_id, message):
-    mc_command_body = message.replace("!! ", '')
+    mc_command_body = message.replace("!!", '')
     mc_command_arg = mc_command_body.split(' ')[0]
     if mc_command_arg == 'shut':
         arg = QQMCBind.look_for_qqid(mc_command_body.split(' ')[1])

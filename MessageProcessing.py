@@ -120,16 +120,22 @@ def qq_command_processing(qqapi_url, qqgroup_id, message):
         SendMessage.qq_kick_send(qqapi_url, qqgroup_id, qqid)
 
 
-def mc_message_processing(qqapi_url, qqgroup_id, last_line):
+def mc_message_processing(qqapi_url, qqgroup_id, mcapi_url, mcuuid, mcremote_uuid, mcapikey, edition, last_line):
     Message = ''
     # 分情况处理消息，返回处理好的消息内容
     if "[Server thread/INFO]" in last_line:
         if "[Server thread/INFO]: [Not Secure]" in last_line:
             Message = last_line[46:-1]
             raw_message = Message.replace('<', '').split('> ')[1]
+            sender = QQMCBind.look_for_qqid(Message.replace('<', '').split('> ')[0])
             if raw_message[0:3] == "!! ":
-                qq_command_processing(qqapi_url, qqgroup_id, Message)
-                return None
+                if is_member_in_oplist(sender):
+                    qq_command_processing(qqapi_url, qqgroup_id, Message)
+                    return None
+                else:
+                    SendMessage.send_robot_message(qqapi_url, qqgroup_id, mcapi_url, mcuuid, mcremote_uuid, mcapikey,
+                                                   '权限不够！', edition)
+
         if "[Server thread/INFO]: There are" in last_line:
             Message = last_line[33:-1]
         if "[pool-2-thread-1/INFO]: [Textile Backup] Starting backup" in last_line:

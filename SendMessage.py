@@ -1,5 +1,6 @@
 import requests
 import MessageProcessing
+import json
 
 
 # 定义QQ消息的发送函数
@@ -185,3 +186,31 @@ def qq_kick_send(qqapi_url, qqgroup_id, qqid):
     }
     request = requests.post(qqapi_url, data=data)
     return request
+
+
+def send_robot_message(qqapi_url, qqgroup_id, mcapi_url, mcuuid, mcremote_uuid, mcapikey, message, edition):
+    if edition:
+        data = [
+            {
+                'text': '[Robot]',
+                'bold': 'true',
+                'color': 'blue'
+            },
+            {
+                'text': message,
+                'color': 'green'
+            }
+        ]
+        json_data = json.dumps(data)
+    else:
+        data = {
+            'rawtext': [
+                {
+                    'text': message
+                }
+            ]
+        }
+        json_data = json.dumps(data)
+
+    command = "tellraw @a " + json_data
+    mc_command_send(qqapi_url, qqgroup_id, mcapi_url, mcuuid, mcremote_uuid, mcapikey, command)

@@ -19,7 +19,7 @@ MCREMOTE_UUID = MC['MCREMOTE_UUID']
 MCAPIKEY = MC['MCAPIKEY']
 java_edition = MC['IsJavaEdition']
 log = MC['MCLOG']
-message_bak = None
+lastline_bak = None
 
 
 # 定义MC消息获取函数，通过读取日志最后一行的形式获取消息
@@ -42,12 +42,13 @@ def lastline_get(fname):
 
 # 通过一个死循环来反复读取日志最后一行，实现类似tail -f的功能
 while True:
+    lastline = lastline_get(log)
     message = MessageProcessing.mc_message_processing(QQAPI, QQGroup_id, MCURL, MCUUID, MCREMOTE_UUID, MCAPIKEY,
-                                                      java_edition, lastline_get(log))
+                                                      java_edition, lastline)
     # 比较这一次的读取和上一次的读取有什么不同，若相同，则不输出，反之则输出
-    if message != message_bak and message is not None and message != 'None':
+    if lastline != lastline_bak and message is not None and message != 'None':
         # 将API返回的状态码和处理好的消息打印出来，便于检查与调试
         print(SendMessage.qq_message_send(QQAPI, QQGroup_id, message))
         print(message)
-        message_bak = message
+        lastline_bak = lastline
         time.sleep(0.3)

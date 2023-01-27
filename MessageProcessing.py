@@ -105,7 +105,7 @@ def qq_message_processing(qqapi_url, qqgroup_id, mcapi_url, uuid, remote_uuid, a
         return SendMessage.mc_message_send(mcapi_url, uuid, remote_uuid, apikey, message, sender, java_edition)
 
 
-def qq_command_processing(qqapi_url, qqgroup_id, message):
+def qq_command_processing(qqapi_url, qqgroup_id, mcapi_url, mcuuid, mcremote_uuid, mcapikey, message):
     mc_command_body = message.replace("!!", '')
     mc_command_arg = mc_command_body.split(' ')[0]
     if mc_command_arg == 'shut':
@@ -118,6 +118,8 @@ def qq_command_processing(qqapi_url, qqgroup_id, message):
     elif mc_command_arg == 'kick':
         qqid = QQMCBind.look_for_qqid(mc_command_body.split(' ')[1])
         SendMessage.qq_kick_send(qqapi_url, qqgroup_id, qqid)
+    else:
+        SendMessage.send_robot_message(qqapi_url, qqgroup_id, mcapi_url, mcuuid, mcremote_uuid, mcapikey, "输入错误！")
 
 
 def mc_message_processing(qqapi_url, qqgroup_id, mcapi_url, mcuuid, mcremote_uuid, mcapikey, edition, last_line):
@@ -131,7 +133,7 @@ def mc_message_processing(qqapi_url, qqgroup_id, mcapi_url, mcuuid, mcremote_uui
             sender = QQMCBind.look_for_qqid(Message.replace('<', '').split('> ')[0])
             if raw_message[0:2] == "!!" and Message != message_bak:
                 if is_member_in_oplist(sender):
-                    qq_command_processing(qqapi_url, qqgroup_id, Message)
+                    qq_command_processing(qqapi_url, qqgroup_id, mcapi_url, mcuuid, mcremote_uuid, mcapikey, Message)
                     return None
                 else:
                     SendMessage.send_robot_message(qqapi_url, qqgroup_id, mcapi_url, mcuuid, mcremote_uuid, mcapikey,

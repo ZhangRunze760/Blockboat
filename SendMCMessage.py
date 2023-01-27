@@ -1,8 +1,9 @@
+import time
+
 import yaml
 
 import MessageProcessing
 import SendMessage
-import time
 
 with open('botconfig.yaml', 'r', encoding='utf-8') as file:
     yaml_info = yaml.load(file, Loader=yaml.FullLoader)
@@ -12,6 +13,11 @@ QQ = yaml_info['QQ']
 
 QQAPI = QQ['QQAPI']
 QQGroup_id = QQ['QQGroup_id']
+MCURL = MC['MCURL']
+MCUUID = MC['MCUUID']
+MCREMOTE_UUID = MC['MCREMOTE_UUID']
+MCAPIKEY = MC['MCAPIKEY']
+java_edition = MC['IsJavaEdition']
 log = MC['MCLOG']
 message_bak = None
 
@@ -36,7 +42,8 @@ def lastline_get(fname):
 
 # 通过一个死循环来反复读取日志最后一行，实现类似tail -f的功能
 while True:
-    message = MessageProcessing.mc_message_processing(QQAPI, QQGroup_id, lastline_get(log))
+    message = MessageProcessing.mc_message_processing(QQAPI, QQGroup_id, MCURL, MCUUID, MCREMOTE_UUID, MCAPIKEY,
+                                                      java_edition, lastline_get(log))
     # 比较这一次的读取和上一次的读取有什么不同，若相同，则不输出，反之则输出
     if message != message_bak and message is not None and message != 'None':
         # 将API返回的状态码和处理好的消息打印出来，便于检查与调试

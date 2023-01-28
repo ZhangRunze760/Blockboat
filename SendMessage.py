@@ -212,5 +212,13 @@ def send_robot_message(qqapi_url, qqgroup_id, mcapi_url, mcuuid, mcremote_uuid, 
         }
         json_data = json.dumps(data)
 
+    mcapi = '/api/protected_instance/command'
     command = "tellraw @a " + json_data
-    mc_command_send(qqapi_url, qqgroup_id, mcapi_url, mcuuid, mcremote_uuid, mcapikey, command)
+    http_command = mcapi_url + \
+                   mcapi + \
+                   '?' + \
+                   '&' + 'uuid=' + mcuuid + \
+                   '&' + 'remote_uuid=' + mcremote_uuid + \
+                   '&' + 'apikey=' + mcapikey + \
+                   '&' + 'command=' + command
+    return requests.get(http_command)

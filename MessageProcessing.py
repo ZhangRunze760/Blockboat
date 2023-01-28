@@ -113,7 +113,7 @@ def qq_command_processing(qqapi_url, qqgroup_id, mcapi_url, mcuuid, mcremote_uui
         time = mc_command_body.split(' ')[2]
         request = SendMessage.qq_shut_send(qqapi_url, qqgroup_id, arg, time)
     elif mc_command_arg == 'shutall':
-        enable = bool(mc_command_body.split(' ')[1])
+        enable = mc_command_body.split(' ')[1]
         request = SendMessage.qq_shutall_send(qqapi_url, qqgroup_id, enable)
     elif mc_command_arg == 'kick':
         qqid = QQMCBind.look_for_qqid(mc_command_body.split(' ')[1])

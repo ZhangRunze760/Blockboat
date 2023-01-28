@@ -111,15 +111,39 @@ def qq_command_processing(qqapi_url, qqgroup_id, mcapi_url, mcuuid, mcremote_uui
     if mc_command_arg == 'shut':
         arg = QQMCBind.look_for_qqid(mc_command_body.split(' ')[1])
         time = mc_command_body.split(' ')[2]
-        SendMessage.qq_shut_send(qqapi_url, qqgroup_id, arg, time)
+        request = SendMessage.qq_shut_send(qqapi_url, qqgroup_id, arg, time)
     elif mc_command_arg == 'shutall':
         enable = bool(mc_command_body.split(' ')[1])
-        SendMessage.qq_shutall_send(qqapi_url, qqgroup_id, enable)
+        request = SendMessage.qq_shutall_send(qqapi_url, qqgroup_id, enable)
     elif mc_command_arg == 'kick':
         qqid = QQMCBind.look_for_qqid(mc_command_body.split(' ')[1])
-        SendMessage.qq_kick_send(qqapi_url, qqgroup_id, qqid)
+        request = SendMessage.qq_kick_send(qqapi_url, qqgroup_id, qqid)
     else:
         SendMessage.send_robot_message(qqapi_url, qqgroup_id, mcapi_url, mcuuid, mcremote_uuid, mcapikey, "输入错误！",
+                                       edition)
+        request = None
+    if request.status_code == 200:
+        SendMessage.send_robot_message(qqapi_url, qqgroup_id, mcapi_url, mcuuid, mcremote_uuid, mcapikey, "发送成功！",
+                                       edition)
+    elif request.status_code == 400:
+        SendMessage.send_robot_message(qqapi_url, qqgroup_id, mcapi_url, mcuuid, mcremote_uuid, mcapikey,
+                                       "发送失败，请求参数不正确，请检查配置文件。",
+                                       edition)
+    elif request.status_code == 403:
+        SendMessage.send_robot_message(qqapi_url, qqgroup_id, mcapi_url, mcuuid, mcremote_uuid, mcapikey,
+                                       "发送失败，权限不够，请检查配置文件。",
+                                       edition)
+    elif request.status_code == 404:
+        SendMessage.send_robot_message(qqapi_url, qqgroup_id, mcapi_url, mcuuid, mcremote_uuid, mcapikey,
+                                       "发送失败，未找到后台API，请检查配置文件。",
+                                       edition)
+    elif request.status_code == 500:
+        SendMessage.send_robot_message(qqapi_url, qqgroup_id, mcapi_url, mcuuid, mcremote_uuid, mcapikey,
+                                       "发送失败，可能是命令正在执行或后台出现错误。",
+                                       edition)
+    else:
+        SendMessage.send_robot_message(qqapi_url, qqgroup_id, mcapi_url, mcuuid, mcremote_uuid, mcapikey,
+                                       "发送失败，出现未知错误。",
                                        edition)
 
 

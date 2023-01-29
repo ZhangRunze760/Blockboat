@@ -1,7 +1,11 @@
+import threading
+
 import yaml
-import MessageProcessing
 from flask import Flask, request
+
+import MessageProcessing
 import QQMCBind
+import SendMCMessage
 
 # 运用with语句和yaml处理函数提取出我们在yaml文件中所写的数据，并打包为字典
 with open('botconfig.yaml', 'r', encoding='utf-8') as file:
@@ -20,32 +24,45 @@ MCUUID = MC['MCUUID']
 MCREMOTE_UUID = MC['MCREMOTE_UUID']
 MCAPIKEY = MC['MCAPIKEY']
 java_edition = MC['IsJavaEdition']
-app = Flask(__name__)
 
 
-@app.route('/', methods=["POST"])
-def post_data():
-    # 将得到的数据打印，便于检查与调试
-    print(request.get_json())
+class MainThread(threading.Thread):
+    def __init__(self, threadid, name, counter):
+        threading.Thread.__init__(self)
+        self.threadid = threadid
+        self.name = name
+        self.counter = counter
 
-    if request.get_json().get('group_id') == QQGroup_id:
-        with open('Bind.yaml', 'r', encoding='utf-8') as yaml_file:
-            bind_info = yaml.load(yaml_file, Loader=yaml.FullLoader)
-            list_of_qqid = list(bind_info.keys())
+    def run(self):  # 把要执行的代码写到run函数里面 线程在创建后会直接运行run函数
+        app = Flask(__name__)
 
-        # 获取需要的消息
-        qqid = request.get_json().get('sender').get('user_id')  # 发送者的QQ号
-        if str(qqid) in list_of_qqid:
-            who = QQMCBind.look_for_mcid(qqid)
-        else:
-            who = request.get_json().get('sender').get('card')
-        message = request.get_json().get('raw_message')  # 发的什么东西
+        @app.route('/', methods=["POST"])
+        def post_data():
+            if request.get_json().get('group_id') == QQGroup_id:
+                with open('Bind.yaml', 'r', encoding='utf-8') as yaml_file:
+                    bind_info = yaml.load(yaml_file, Loader=yaml.FullLoader)
+                    list_of_qqid = list(bind_info.keys())
 
-        MessageProcessing.qq_message_processing(QQAPI, QQGroup_id, MCURL, MCUUID, MCREMOTE_UUID, MCAPIKEY, message,
-                                                  qqid, who, java_edition)
+                # 获取需要的消息
+                qqid = request.get_json().get('sender').get('user_id')  # 发送者的QQ号
+                if str(qqid) in list_of_qqid:
+                    who = QQMCBind.look_for_mcid(qqid)
+                else:
+                    who = request.get_json().get('sender').get('card')
+                message = request.get_json().get('raw_message')  # 发的什么东西
 
-    return 'OK'  # 对go-cqhttp进行响应，不然会出现三次重试
+                MessageProcessing.qq_message_processing(QQAPI, QQGroup_id, MCURL, MCUUID, MCREMOTE_UUID, MCAPIKEY,
+                                                        message,
+                                                        qqid, who, java_edition)
+                print("从HTTP POST上报器处成功接收上报，JSON字符串为：" + request.get_json())
+
+            return 'OK'  # 对go-cqhttp进行响应，不然会出现三次重试
+
+        # 开启我们的端口监听，监听我们设置好的端口，从而使得机器人框架向我们上报消息
+        app.run(debug=True, host=QQURL, port=int(QQPort), threaded=True)
 
 
-# 开启我们的端口监听，监听我们设置好的端口，从而使得机器人框架向我们上报消息
-app.run(debug=True, host=QQURL, port=int(QQPort))
+main_thread = MainThread(1, "机器人主程序", 1)
+SendMCMessage.send_mc_message_thread.start()
+main_thread.start()
+print("机器人成功启动！")

@@ -119,32 +119,23 @@ def qq_command_processing(qqapi_url, qqgroup_id, mcapi_url, mcuuid, mcremote_uui
         qqid = QQMCBind.look_for_qqid(mc_command_body.split(' ')[1])
         request = SendMessage.qq_kick_send(qqapi_url, qqgroup_id, qqid)
     else:
-        SendMessage.send_robot_message(qqapi_url, qqgroup_id, mcapi_url, mcuuid, mcremote_uuid, mcapikey, "输入错误！",
-                                       edition)
+        SendMessage.send_robot_message(mcapi_url, mcuuid, mcremote_uuid, mcapikey, "输入错误！", edition)
         request = None
+
+    print(request.status_code)
+
     if request.status_code == 200:
-        SendMessage.send_robot_message(qqapi_url, qqgroup_id, mcapi_url, mcuuid, mcremote_uuid, mcapikey, "发送成功！",
-                                       edition)
+        SendMessage.send_robot_message(mcapi_url, mcuuid, mcremote_uuid, mcapikey, "发送成功！", edition)
     elif request.status_code == 400:
-        SendMessage.send_robot_message(qqapi_url, qqgroup_id, mcapi_url, mcuuid, mcremote_uuid, mcapikey,
-                                       "发送失败，请求参数不正确，请检查配置文件。",
-                                       edition)
+        SendMessage.send_robot_message(mcapi_url, mcuuid, mcremote_uuid, mcapikey, "发送失败，请求参数不正确，请检查配置文件。", edition)
     elif request.status_code == 403:
-        SendMessage.send_robot_message(qqapi_url, qqgroup_id, mcapi_url, mcuuid, mcremote_uuid, mcapikey,
-                                       "发送失败，权限不够，请检查配置文件。",
-                                       edition)
+        SendMessage.send_robot_message(mcapi_url, mcuuid, mcremote_uuid, mcapikey, "发送失败，权限不够，请检查配置文件。", edition)
     elif request.status_code == 404:
-        SendMessage.send_robot_message(qqapi_url, qqgroup_id, mcapi_url, mcuuid, mcremote_uuid, mcapikey,
-                                       "发送失败，未找到后台API，请检查配置文件。",
-                                       edition)
+        SendMessage.send_robot_message(mcapi_url, mcuuid, mcremote_uuid, mcapikey, "发送失败，未找到后台API，请检查配置文件。", edition)
     elif request.status_code == 500:
-        SendMessage.send_robot_message(qqapi_url, qqgroup_id, mcapi_url, mcuuid, mcremote_uuid, mcapikey,
-                                       "发送失败，可能是命令正在执行或后台出现错误。",
-                                       edition)
+        SendMessage.send_robot_message(mcapi_url, mcuuid, mcremote_uuid, mcapikey, "发送失败，可能是命令正在执行或后台出现错误。", edition)
     else:
-        SendMessage.send_robot_message(qqapi_url, qqgroup_id, mcapi_url, mcuuid, mcremote_uuid, mcapikey,
-                                       "发送失败，出现未知错误。",
-                                       edition)
+        SendMessage.send_robot_message(mcapi_url, mcuuid, mcremote_uuid, mcapikey, "发送失败，出现未知错误。", edition)
 
 
 def mc_message_processing(qqapi_url, qqgroup_id, mcapi_url, mcuuid, mcremote_uuid, mcapikey, edition, last_line):
@@ -161,24 +152,20 @@ def mc_message_processing(qqapi_url, qqgroup_id, mcapi_url, mcuuid, mcremote_uui
                                           raw_message, edition)
                     return None
                 else:
-                    SendMessage.send_robot_message(qqapi_url, qqgroup_id, mcapi_url, mcuuid, mcremote_uuid, mcapikey,
+                    SendMessage.send_robot_message(mcapi_url, mcuuid, mcremote_uuid, mcapikey,
                                                    '权限不够！', edition)
                     return None
 
-        if "[Server thread/INFO]: There are" in last_line:
+        elif "[Server thread/INFO]: There are" in last_line:
             Message = last_line[33:-1]
-        if "[pool-2-thread-1/INFO]: [Textile Backup] Starting backup" in last_line:
-            Message = "开始备份...可能会出现微小卡顿。"
-        if "[pool-2-thread-1/INFO]: [Textile Backup] Compression took:" in last_line:
-            Message = "备份完成！花费时间：" + last_line[58:-1]
-        if "[Server thread/INFO]" in last_line and " joined the game" in last_line:
+        elif "[Server thread/INFO]" in last_line and " joined the game" in last_line:
             Message = last_line[33:-17] + "加入了游戏"
-        if "[Server thread/INFO]" in last_line and "left the game" in last_line:
+        elif "[Server thread/INFO]" in last_line and "left the game" in last_line:
             Message = last_line[33:-15] + "退出了游戏"
     else:
-        if "[pool-2-thread-1/INFO]: [Textile Backup] Starting backup" in last_line:
+        if "[pool-6-thread-1/INFO]: [Textile Backup] Starting backup" in last_line:
             Message = "开始备份...可能会出现微小卡顿。"
-        if "[pool-2-thread-1/INFO]: [Textile Backup] Compression took:" in last_line:
+        if "[pool-6-thread-1/INFO]: [Textile Backup] Compression took:" in last_line:
             Message = "备份完成！花费时间：" + last_line[70:-1]
 
     if '@' in Message:

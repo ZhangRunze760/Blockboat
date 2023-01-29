@@ -169,7 +169,7 @@ def qq_shut_send(qqapi_url, qqgroup_id, qqid, time):
 
 
 def qq_shutall_send(qqapi_url, qqgroup_id, enable):
-    qqapi_url = qqapi_url.replace('send_group_msg', '/set_group_whole_ban')
+    qqapi_url = qqapi_url.replace('send_group_msg', 'set_group_whole_ban')
     data = {
         'group_id': qqgroup_id,
         'enable': enable
@@ -188,11 +188,11 @@ def qq_kick_send(qqapi_url, qqgroup_id, qqid):
     return request
 
 
-def send_robot_message(qqapi_url, qqgroup_id, mcapi_url, mcuuid, mcremote_uuid, mcapikey, message, edition):
+def send_robot_message(mcapi_url, mcuuid, mcremote_uuid, mcapikey, message, edition):
     if edition:
         data = [
             {
-                'text': '[Robot]',
+                'text': '[Bot]',
                 'bold': 'true',
                 'color': 'blue'
             },
@@ -206,7 +206,7 @@ def send_robot_message(qqapi_url, qqgroup_id, mcapi_url, mcuuid, mcremote_uuid, 
         data = {
             'rawtext': [
                 {
-                    'text': message
+                    'text': '[Bot]' + message
                 }
             ]
         }

@@ -142,7 +142,7 @@ def mc_message_processing(qqapi_url, qqgroup_id, mcapi_url, mcuuid, mcremote_uui
     Message = ''
     # 分情况处理消息，返回处理好的消息内容
     if "[Server thread/INFO]" in last_line:
-        if "[Server thread/INFO]: [Not Secure]" in last_line:
+        if "[Server thread/INFO]: [Not Secure] <" in last_line:
             Message = last_line[46:-1]
             raw_message = Message.replace('<', '').split('> ')[1]
             sender = QQMCBind.look_for_qqid(Message.replace('<', '').split('> ')[0])
